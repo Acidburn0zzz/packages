@@ -1,0 +1,25 @@
+# bootstrap from official binary - maybe this fixes everything :-)
+
+makedepends=("${makedepends[@]/sbcl/}")
+source_i686=('http://prdownloads.sourceforge.net/sbcl/sbcl-1.2.7-x86-linux-binary.tar.bz2')
+source_x86_64=('http://prdownloads.sourceforge.net/sbcl/sbcl-1.4.0-x86-64-linux-binary.tar.bz2')
+sha256sums_i686=('724425fe0d28747c7d31c6655e39fa8c27f9ef4608c482ecc60089bcc85fc31d')
+sha256sums_x86_64=('2b8d5256cb7e3057f47c3d81355d46dd96d966928652c011da613c519c532b67')
+
+eval "$(
+  declare -f build | \
+    sed '
+      /^{/ a \
+  local sbcl_bin_dir \
+  sbcl_bin_dir="$srcdir/sbcl-bin" \
+  mkdir "${sbcl_bin_dir}" \
+  cd "$( \
+    find "$srcdir" -maxdepth 1 -mindepth 1 -type d -name 'sbcl-*-linux' \
+  )" \
+  chmod +x install.sh \
+  INSTALL_ROOT="${sbcl_bin_dir}" "./install.sh" \
+  export PATH="${sbcl_bin_dir}/bin:${PATH}" \
+  export SBCL_HOME="${sbcl_bin_dir}/lib/sbcl"
+      /export CFLAGS+=/s@/usr/lib/sbcl@${SBCL_HOME}@
+    '
+)"
